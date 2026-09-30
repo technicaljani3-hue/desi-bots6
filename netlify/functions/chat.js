@@ -19,7 +19,7 @@ exports.handler = async (event) => {
     if (!persona || !Array.isArray(messages)) return out("Ghalat request.", 400);
     const key = process.env.GROQ_API_KEY;
     if (!key) return out("GROQ_API_KEY Netlify mein set nahi hai.", 500);
-    const model = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+    const model = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
     const chat = messages.slice(-12).map(m => ({
       role: m.role === "user" ? "user" : "assistant",
       content: String(m.text || "").slice(0, 1000)
@@ -28,7 +28,7 @@ exports.handler = async (event) => {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + key },
       body: JSON.stringify({
-        model, temperature: 1, max_tokens: 300,
+        model, temperature: 1, max_completion_tokens: 1500, reasoning_effort: "low",
         messages: [{ role: "system", content: persona + "\n\n" + COMMON }, ...chat]
       })
     });
